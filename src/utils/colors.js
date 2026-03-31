@@ -1,7 +1,5 @@
 import chalk from 'chalk';
-
-const VALID_STATUSES = new Set(['todo', 'in-progress', 'done']);
-const VALID_PRIORITIES = new Set(['low', 'medium', 'high']);
+import { validatePriority, validateStatus } from './validators.js';
 
 /**
  * Returns a colorized status label for terminal display.
@@ -19,15 +17,7 @@ const VALID_PRIORITIES = new Set(['low', 'medium', 'high']);
  * // => red "todo"
  */
 export function colorStatus(status) {
-  if (typeof status !== 'string') {
-    throw new TypeError('status must be a string');
-  }
-
-  if (!VALID_STATUSES.has(status)) {
-    throw new TypeError(
-      'status must be one of: todo, in-progress, done'
-    );
-  }
+  validateStatus(status);
 
   if (status === 'done') {
     return chalk.green(status);
@@ -56,13 +46,7 @@ export function colorStatus(status) {
  * // => dim "low"
  */
 export function colorPriority(priority) {
-  if (typeof priority !== 'string') {
-    throw new TypeError('priority must be a string');
-  }
-
-  if (!VALID_PRIORITIES.has(priority)) {
-    throw new TypeError('priority must be one of: low, medium, high');
-  }
+  validatePriority(priority);
 
   if (priority === 'high') {
     return chalk.bold.red(priority);

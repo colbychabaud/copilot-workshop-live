@@ -69,7 +69,7 @@ function runDemo() {
 
   const deletedTask = deleteTask(taskC.id);
   console.log('\nDeleted one task:');
-  console.log(deletedTask);
+  console.log(formatTaskForDisplay(deletedTask));
 
   console.log('\nRemaining tasks:');
   console.log(
