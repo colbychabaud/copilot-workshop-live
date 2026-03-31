@@ -4,6 +4,19 @@ import {
   listTasks,
   updateTask
 } from './services/taskService.js';
+import { colorPriority, colorStatus } from './utils/colors.js';
+
+function formatTaskForDisplay(task) {
+  return {
+    ...task,
+    status: colorStatus(task.status),
+    priority: colorPriority(task.priority)
+  };
+}
+
+function formatTasksForDisplay(tasks) {
+  return tasks.map(formatTaskForDisplay);
+}
 
 function runDemo() {
   console.log('Task Manager CLI demo start');
@@ -27,35 +40,41 @@ function runDemo() {
   });
 
   console.log('\nCreated tasks:');
-  console.log(taskA);
-  console.log(taskB);
-  console.log(taskC);
+  console.log(formatTaskForDisplay(taskA));
+  console.log(formatTaskForDisplay(taskB));
+  console.log(formatTaskForDisplay(taskC));
 
   console.log('\nAll tasks sorted by createdAt asc:');
-  console.log(listTasks({ sortBy: 'createdAt', sortOrder: 'asc' }));
+  console.log(
+    formatTasksForDisplay(listTasks({ sortBy: 'createdAt', sortOrder: 'asc' }))
+  );
 
   console.log('\nFilter by status=todo:');
-  console.log(listTasks({ status: 'todo' }));
+  console.log(formatTasksForDisplay(listTasks({ status: 'todo' })));
 
   console.log('\nFilter by priority=high:');
-  console.log(listTasks({ priority: 'high' }));
+  console.log(formatTasksForDisplay(listTasks({ priority: 'high' })));
 
   console.log('\nSorted by priority desc:');
-  console.log(listTasks({ sortBy: 'priority', sortOrder: 'desc' }));
+  console.log(
+    formatTasksForDisplay(listTasks({ sortBy: 'priority', sortOrder: 'desc' }))
+  );
 
   const updatedTask = updateTask(taskA.id, {
     status: 'in-progress',
     description: 'Backlog drafted and ready for review.'
   });
   console.log('\nUpdated first task:');
-  console.log(updatedTask);
+  console.log(formatTaskForDisplay(updatedTask));
 
   const deletedTask = deleteTask(taskC.id);
   console.log('\nDeleted one task:');
-  console.log(deletedTask);
+  console.log(formatTaskForDisplay(deletedTask));
 
   console.log('\nRemaining tasks:');
-  console.log(listTasks({ sortBy: 'createdAt', sortOrder: 'asc' }));
+  console.log(
+    formatTasksForDisplay(listTasks({ sortBy: 'createdAt', sortOrder: 'asc' }))
+  );
 
   console.log('\nTask Manager CLI demo complete');
 }
