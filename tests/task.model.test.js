@@ -11,9 +11,24 @@ test('Task constructor creates a valid task with defaults', () => {
   assert.equal(json.description, '');
   assert.equal(json.status, 'todo');
   assert.equal(json.priority, 'medium');
+  assert.equal(json.category, 'general');
   assert.match(json.id, /^[0-9a-f-]{36}$/i);
   assert.ok(!Number.isNaN(Date.parse(json.createdAt)));
   assert.ok(!Number.isNaN(Date.parse(json.updatedAt)));
+});
+
+test('Task constructor trims category', () => {
+  const task = new Task({ title: 'Categorized', category: '  work  ' });
+  const json = task.toJSON();
+
+  assert.equal(json.category, 'work');
+});
+
+test('Task constructor throws when category is empty', () => {
+  assert.throws(
+    () => new Task({ title: 'A', category: '   ' }),
+    /category must be a non-empty string/
+  );
 });
 
 test('Task constructor trims title and description', () => {
@@ -39,6 +54,7 @@ test('Task constructor accepts missing optional fields', () => {
   assert.equal(json.description, '');
   assert.equal(json.status, 'todo');
   assert.equal(json.priority, 'medium');
+  assert.equal(json.category, 'general');
 });
 
 test('Task constructor accepts boundary title length of 120 characters', () => {
@@ -72,6 +88,7 @@ test('Task constructor throws for type mismatches on string fields', () => {
   assert.throws(() => new Task({ title: 'A', description: 123 }), /description must be a string/);
   assert.throws(() => new Task({ title: 'A', status: 123 }), /status must be one of/);
   assert.throws(() => new Task({ title: 'A', priority: 123 }), /priority must be one of/);
+  assert.throws(() => new Task({ title: 'A', category: 123 }), /category must be a string/);
 });
 
 test('Task constructor allows duplicate ids at model level', () => {
@@ -125,6 +142,7 @@ test('toJSON returns a plain object with task fields', () => {
   assert.equal(output.description, task.description);
   assert.equal(output.status, task.status);
   assert.equal(output.priority, task.priority);
+  assert.equal(output.category, task.category);
   assert.equal(output.createdAt, task.createdAt);
   assert.equal(output.updatedAt, task.updatedAt);
 });

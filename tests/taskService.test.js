@@ -25,7 +25,14 @@ test('createTask stores and returns a new task', () => {
   assert.equal(created.title, 'Create first task');
   assert.equal(created.priority, 'high');
   assert.equal(created.status, 'todo');
+  assert.equal(created.category, 'general');
   assert.ok(created.id);
+});
+
+test('createTask stores category when provided', () => {
+  const created = createTask({ title: 'Work item', category: 'work' });
+
+  assert.equal(created.category, 'work');
 });
 
 test('createTask throws for non-object input', () => {
@@ -72,6 +79,10 @@ test('createTask rejects numeric type mismatches for string and enum fields', ()
     () => createTask({ title: 'Type mismatch', priority: 2 }),
     /priority must be one of/
   );
+  assert.throws(
+    () => createTask({ title: 'Type mismatch', category: 3 }),
+    /category must be a string/
+  );
 });
 
 test('listTasks returns a copy rather than internal references', () => {
@@ -109,6 +120,16 @@ test('listTasks filters tasks by priority', () => {
 
   assert.equal(highPriorityTasks.length, 1);
   assert.equal(highPriorityTasks[0].priority, 'high');
+});
+
+test('listTasks filters tasks by category', () => {
+  createTask({ title: 'Work one', category: 'work' });
+  createTask({ title: 'Personal one', category: 'personal' });
+
+  const workTasks = listTasks({ category: 'work' });
+
+  assert.equal(workTasks.length, 1);
+  assert.equal(workTasks[0].category, 'work');
 });
 
 test('listTasks sorts tasks by priority descending', () => {
@@ -153,6 +174,10 @@ test('listTasks throws for invalid filter options', () => {
   assert.throws(() => listTasks({ status: 'blocked' }), /status must be one of/);
 });
 
+test('listTasks throws for invalid category filter', () => {
+  assert.throws(() => listTasks({ category: '   ' }), /category must be a non-empty string/);
+});
+
 test('listTasks throws for invalid sort options', () => {
   assert.throws(() => listTasks({ sortBy: 'title' }), /sortBy must be either/);
 });
@@ -180,6 +205,14 @@ test('updateTask rejects numeric type mismatches in update payload', () => {
   assert.throws(() => updateTask(created.id, { description: 42 }), /description must be a string/);
   assert.throws(() => updateTask(created.id, { status: 42 }), /status must be one of/);
   assert.throws(() => updateTask(created.id, { priority: 42 }), /priority must be one of/);
+  assert.throws(() => updateTask(created.id, { category: 42 }), /category must be a string/);
+});
+
+test('updateTask updates category field', () => {
+  const created = createTask({ title: 'Categorize me' });
+  const updated = updateTask(created.id, { category: 'urgent' });
+
+  assert.equal(updated.category, 'urgent');
 });
 
 test('updateTask throws when id is not found', () => {

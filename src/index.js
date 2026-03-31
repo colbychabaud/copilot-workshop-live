@@ -24,13 +24,15 @@ function runDemo() {
   const taskA = createTask({
     title: 'Plan sprint backlog',
     description: 'Prepare tasks for the next sprint planning meeting.',
-    priority: 'high'
+    priority: 'high',
+    category: 'work'
   });
   const taskB = createTask({
     title: 'Refine API documentation',
     description: 'Update endpoint examples and response codes.',
     status: 'in-progress',
-    priority: 'medium'
+    priority: 'medium',
+    category: 'work'
   });
   const taskC = createTask({
     title: 'Clean up old notes',
@@ -55,6 +57,9 @@ function runDemo() {
   console.log('\nFilter by priority=high:');
   console.log(formatTasksForDisplay(listTasks({ priority: 'high' })));
 
+  console.log('\nFilter by category=work:');
+  console.log(formatTasksForDisplay(listTasks({ category: 'work' })));
+
   console.log('\nSorted by priority desc:');
   console.log(
     formatTasksForDisplay(listTasks({ sortBy: 'priority', sortOrder: 'desc' }))
@@ -62,7 +67,8 @@ function runDemo() {
 
   const updatedTask = updateTask(taskA.id, {
     status: 'in-progress',
-    description: 'Backlog drafted and ready for review.'
+    description: 'Backlog drafted and ready for review.',
+    category: 'urgent'
   });
   console.log('\nUpdated first task:');
   console.log(formatTaskForDisplay(updatedTask));

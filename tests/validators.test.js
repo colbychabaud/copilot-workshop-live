@@ -2,9 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  DEFAULT_TASK_CATEGORY,
   PRIORITY_RANK,
   TASK_PRIORITIES,
   TASK_STATUSES,
+  validateCategory,
   validateDescription,
   validateFilterOptions,
   validatePriority,
@@ -13,6 +15,10 @@ import {
   validateTaskId,
   validateTitle
 } from '../src/utils/validators.js';
+
+test('DEFAULT_TASK_CATEGORY is general', () => {
+  assert.equal(DEFAULT_TASK_CATEGORY, 'general');
+});
 
 test('TASK_STATUSES exposes expected values', () => {
   assert.deepEqual(TASK_STATUSES, ['todo', 'in-progress', 'done']);
@@ -72,6 +78,18 @@ test('validatePriority throws for unsupported priority', () => {
   assert.throws(() => validatePriority('urgent'), /priority must be one of/);
 });
 
+test('validateCategory returns trimmed category for valid input', () => {
+  assert.equal(validateCategory('  work  '), 'work');
+});
+
+test('validateCategory throws when category is not a string', () => {
+  assert.throws(() => validateCategory(42), /category must be a string/);
+});
+
+test('validateCategory throws when category is empty after trim', () => {
+  assert.throws(() => validateCategory('   '), /category must be a non-empty string/);
+});
+
 test('validateTaskId accepts UUID values', () => {
   const uuid = '550e8400-e29b-41d4-a716-446655440000';
   assert.equal(validateTaskId(uuid), uuid);
@@ -97,12 +115,23 @@ test('validateFilterOptions accepts valid priority filter', () => {
   assert.deepEqual(validateFilterOptions({ priority: 'low' }), { priority: 'low' });
 });
 
+test('validateFilterOptions accepts valid category filter', () => {
+  assert.deepEqual(validateFilterOptions({ category: 'work' }), { category: 'work' });
+});
+
 test('validateFilterOptions throws for non-object filters', () => {
   assert.throws(() => validateFilterOptions(null), /filters must be an object/);
 });
 
 test('validateFilterOptions throws for invalid status filter', () => {
   assert.throws(() => validateFilterOptions({ status: 'blocked' }), /status must be one of/);
+});
+
+test('validateFilterOptions throws for invalid category filter', () => {
+  assert.throws(
+    () => validateFilterOptions({ category: '   ' }),
+    /category must be a non-empty string/
+  );
 });
 
 test('validateSortOptions returns defaults when options are omitted', () => {

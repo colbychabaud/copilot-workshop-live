@@ -1,5 +1,7 @@
 import { Task } from '../models/task.js';
 import {
+  DEFAULT_TASK_CATEGORY,
+  validateCategory,
   PRIORITY_RANK,
   validateDescription,
   validateFilterOptions,
@@ -19,7 +21,8 @@ const tasks = [];
  * title: string,
  * description?: string,
  * status?: 'todo' | 'in-progress' | 'done',
- * priority?: 'low' | 'medium' | 'high'
+ * priority?: 'low' | 'medium' | 'high',
+ * category?: string
  * }} input - Create task input.
  * @returns {{
  * id: string,
@@ -27,6 +30,7 @@ const tasks = [];
  * description: string,
  * status: 'todo' | 'in-progress' | 'done',
  * priority: 'low' | 'medium' | 'high',
+ * category: string,
  * createdAt: string,
  * updatedAt: string
  * }} Created task.
@@ -38,7 +42,8 @@ export function createTask(input) {
     title: input.title,
     description: input.description ?? '',
     status: input.status ?? 'todo',
-    priority: input.priority ?? 'medium'
+    priority: input.priority ?? 'medium',
+    category: input.category ?? DEFAULT_TASK_CATEGORY
   });
 
   tasks.push(task);
@@ -51,6 +56,7 @@ export function createTask(input) {
  * @param {{
  * status?: 'todo' | 'in-progress' | 'done',
  * priority?: 'low' | 'medium' | 'high',
+ * category?: string,
  * sortBy?: 'priority' | 'createdAt',
  * sortOrder?: 'asc' | 'desc'
  * }} [options={}] - Filter and sort options.
@@ -60,6 +66,7 @@ export function createTask(input) {
  * description: string,
  * status: 'todo' | 'in-progress' | 'done',
  * priority: 'low' | 'medium' | 'high',
+ * category: string,
  * createdAt: string,
  * updatedAt: string
  * }>} Task list copy.
@@ -67,7 +74,8 @@ export function createTask(input) {
 export function listTasks(options = {}) {
   const filters = validateFilterOptions({
     status: options.status,
-    priority: options.priority
+    priority: options.priority,
+    category: options.category
   });
   const sorting = validateSortOptions({
     sortBy: options.sortBy,
@@ -85,6 +93,10 @@ export function listTasks(options = {}) {
         return false;
       }
 
+      if (filters.category !== undefined && task.category !== filters.category) {
+        return false;
+      }
+
       return true;
     });
 
@@ -99,7 +111,8 @@ export function listTasks(options = {}) {
  * title?: string,
  * description?: string,
  * status?: 'todo' | 'in-progress' | 'done',
- * priority?: 'low' | 'medium' | 'high'
+ * priority?: 'low' | 'medium' | 'high',
+ * category?: string
  * }} updates - Task fields to update.
  * @returns {{
  * id: string,
@@ -107,6 +120,7 @@ export function listTasks(options = {}) {
  * description: string,
  * status: 'todo' | 'in-progress' | 'done',
  * priority: 'low' | 'medium' | 'high',
+ * category: string,
  * createdAt: string,
  * updatedAt: string
  * }} Updated task.
@@ -145,6 +159,7 @@ export function updateTask(id, updates) {
  * description: string,
  * status: 'todo' | 'in-progress' | 'done',
  * priority: 'low' | 'medium' | 'high',
+ * category: string,
  * createdAt: string,
  * updatedAt: string
  * }} Deleted task.
@@ -184,6 +199,10 @@ function validateCreateInput(input) {
   if (input.priority !== undefined) {
     validatePriority(input.priority);
   }
+
+  if (input.category !== undefined) {
+    validateCategory(input.category);
+  }
 }
 
 /**
@@ -196,7 +215,7 @@ function validateUpdateInput(updates) {
     throw new TypeError('Invalid input: updates must be an object.');
   }
 
-  const allowedKeys = ['title', 'description', 'status', 'priority'];
+  const allowedKeys = ['title', 'description', 'status', 'priority', 'category'];
   const providedKeys = Object.keys(updates);
 
   if (providedKeys.length === 0) {
@@ -224,13 +243,17 @@ function validateUpdateInput(updates) {
   if (updates.priority !== undefined) {
     validatePriority(updates.priority);
   }
+
+  if (updates.category !== undefined) {
+    validateCategory(updates.category);
+  }
 }
 
 /**
  * Normalize update payload.
  *
- * @param {{title?: string, description?: string, status?: string, priority?: string}} updates - Update payload.
- * @returns {{title?: string, description?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high'}}
+ * @param {{title?: string, description?: string, status?: string, priority?: string, category?: string}} updates - Update payload.
+ * @returns {{title?: string, description?: string, status?: 'todo' | 'in-progress' | 'done', priority?: 'low' | 'medium' | 'high', category?: string}}
  * Normalized values.
  */
 function normalizeUpdatePayload(updates) {
@@ -250,6 +273,10 @@ function normalizeUpdatePayload(updates) {
 
   if (updates.priority !== undefined) {
     normalizedUpdates.priority = validatePriority(updates.priority);
+  }
+
+  if (updates.category !== undefined) {
+    normalizedUpdates.category = validateCategory(updates.category);
   }
 
   return normalizedUpdates;

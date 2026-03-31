@@ -13,6 +13,8 @@
   - Validation: exact enum match to one of `todo`, `in-progress`, or `done` (case-sensitive).
 - `priority`: 'low' | 'medium' | 'high', required
   - Validation: exact enum match to one of `low`, `medium`, or `high` (case-sensitive).
+- `category`: string, required
+  - Validation: string type, trimmed non-empty value, defaults to `'general'` when omitted at creation.
 - `createdAt`: string, required
   - Validation: valid ISO 8601 UTC timestamp (`Date.parse(createdAt)` is valid), system-managed only, immutable after creation.
 - `updatedAt`: string, required
@@ -33,6 +35,8 @@
   - Validation: same as `Task.status`; default `'todo'`.
 - `priority`: 'low' | 'medium' | 'high', optional
   - Validation: same as `Task.priority`; default `'medium'`.
+- `category`: string, optional
+  - Validation: same as `Task.category`; default `'general'`.
 
 ### UpdateTaskInput
 - `id`: number, required
@@ -45,13 +49,17 @@
   - Validation: same as `Task.status` when present.
 - `priority`: 'low' | 'medium' | 'high', optional
   - Validation: same as `Task.priority` when present.
-- Rule: at least one of `title`, `description`, `status`, or `priority` must be provided.
+- `category`: string, optional
+  - Validation: same as `Task.category` when present.
+- Rule: at least one of `title`, `description`, `status`, `priority`, or `category` must be provided.
 
 ### ListQuery
 - `status`: 'todo' | 'in-progress' | 'done', optional
   - Validation: must be an allowed status value.
 - `priority`: 'low' | 'medium' | 'high', optional
   - Validation: must be an allowed priority value.
+- `category`: string, optional
+  - Validation: string type, trimmed non-empty value.
 - `sortBy`: 'priority' | 'createdAt', optional
   - Validation: must be one of allowed sort fields.
 - `sortDir`: 'asc' | 'desc', optional

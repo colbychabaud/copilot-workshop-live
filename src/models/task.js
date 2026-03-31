@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
 import {
+  DEFAULT_TASK_CATEGORY,
+  validateCategory,
   validateDescription,
   validatePriority,
   validateStatus,
@@ -20,6 +22,7 @@ export class Task {
    * @param {string} [input.description=''] - Task description.
    * @param {'todo' | 'in-progress' | 'done'} [input.status='todo'] - Task status.
    * @param {'low' | 'medium' | 'high'} [input.priority='medium'] - Task priority.
+   * @param {string} [input.category='general'] - Task category.
    * @param {string} [input.id] - Existing UUID, used by update flows.
    * @param {string} [input.createdAt] - Existing creation timestamp.
    * @param {string} [input.updatedAt] - Existing update timestamp.
@@ -29,6 +32,7 @@ export class Task {
     description = '',
     status = 'todo',
     priority = 'medium',
+    category = DEFAULT_TASK_CATEGORY,
     id = randomUUID(),
     createdAt = new Date().toISOString(),
     updatedAt = createdAt
@@ -42,6 +46,7 @@ export class Task {
     this.description = validateDescription(description);
     this.status = validateStatus(status);
     this.priority = validatePriority(priority);
+    this.category = validateCategory(category);
     this.createdAt = validateIsoTimestamp(createdAt, 'createdAt');
     this.updatedAt = validateIsoTimestamp(updatedAt, 'updatedAt');
 
@@ -59,6 +64,7 @@ export class Task {
    * description: string,
    * status: 'todo' | 'in-progress' | 'done',
    * priority: 'low' | 'medium' | 'high',
+  * category: string,
    * createdAt: string,
    * updatedAt: string
    * }}
@@ -70,6 +76,7 @@ export class Task {
       description: this.description,
       status: this.status,
       priority: this.priority,
+      category: this.category,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };
